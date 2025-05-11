@@ -1,3 +1,7 @@
+import service.serial_check as sc
+
+
 def setup_connections(ui):
     for i, btn in enumerate(ui.buttons):
-        btn.clicked.connect(lambda _, x=i: print(f"Button {x + 1} clicked!"))
+        # sc.send_fold_name(x + 1))
+        btn.clicked.connect(lambda _, x=i: print(x+1))
