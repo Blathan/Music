@@ -2,8 +2,9 @@
 #include <DFRobotDFPlayerMini.h>
 #include <EEPROM.h>
 
-#define reseivePin 10;
-#define transmitePin 11;
+#define reseivePin 10
+#define transmitePin 11
+
 SoftwareSerial mySerial(reseivePin, transmitePin);
 DFRobotDFPlayerMini myDFPlayer;
 
@@ -15,8 +16,13 @@ int state;
 void setup() {
     Serial.begin(9600);
     mySerial.begin(9600);
+    
     folderNumber = EEPROM.read(0);
-    state = folderNumber;
+    if (folderNumber < 1 || folderNumber > 99) {
+        folderNumber = 1;
+    }
+    state = folderNumber;  
+
     if (!myDFPlayer.begin(mySerial)) {
         Serial.println("DFPlayer error!");
     }
@@ -29,21 +35,21 @@ void setup() {
 }
 
 void loop() {
-    if (Serial.available()) {
-        int folderNumber = Serial.parseInt();
-        if (folderNumber < 1 || folderNumber > 99) {
-            folderNumber = state;
+    if (Serial.available() > 0) {
+        int inputNumber = Serial.parseInt();
+        if (inputNumber >= 1 && inputNumber <= 99) {
+            folderNumber = inputNumber;
         }
     }
-
-    if(folderNumber != state){
+    
+    if (folderNumber != state) {
         state = folderNumber;
         EEPROM.write(0, state);
     }
     
     for (int i = 0; i < 7; i++) {
         if (digitalRead(photoResistors[i])) {
-            myDFPlayer.playFolder(folderNumber, photoResistors[i] + 1);
+            myDFPlayer.playFolder(folderNumber, photoResistors[i] - 1);
         }
     }
 }
